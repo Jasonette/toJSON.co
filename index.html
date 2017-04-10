@@ -1,0 +1,170 @@
+<html>
+  <head>
+    <script src='./node_modules/jsonlint/lib/jsonlint.js'></script>
+    <link href='./node_modules/codemirror/lib/codemirror.css' rel='stylesheet'>
+    <link href='./node_modules/codemirror/addon/lint/lint.css' rel='stylesheet'>
+		<link href='./node_modules/codemirror/theme/neo.css' rel='stylesheet'>
+    <link href='./style.css' rel='stylesheet'>
+    <script src='./node_modules/codemirror/lib/codemirror.js'></script>
+    <script src='./node_modules/codemirror/addon/lint/lint.js'></script>
+    <script src='./node_modules/codemirror/addon/lint/javascript-lint.js'></script>
+    <script src='./node_modules/codemirror/addon/lint/json-lint.js'></script>
+    <script src='./node_modules/codemirror/addon/search/searchcursor.js'></script>
+    <script src='./node_modules/codemirror/addon/edit/closebrackets.js'></script>
+    <script src='./node_modules/codemirror/addon/edit/matchbrackets.js'></script>
+    <script src='./node_modules/codemirror/mode/javascript/javascript.js'></script>
+    <script src='./node_modules/codemirror/keymap/vim.js'></script>
+    <script src='./node_modules/codemirror/keymap/emacs.js'></script>
+    <script src='./node_modules/codemirror/keymap/sublime.js'></script>
+    <script src='./node_modules/to_json/dist/to_json.js'></script>
+    <script src='./node_modules/jquery/dist/jquery.min.js'></script>
+    <script>
+
+      (function($){
+        $(function(){
+          var data = localStorage.getItem('data');
+          if(!data) data = "";
+          var mode = localStorage.getItem('mode');
+          if(!mode) mode = "default";
+          var data_type = localStorage.getItem('type');
+          if(!data_type) data_type = "yaml";
+
+          $("#editor .list-item.selected").html("&#x25BE " + mode);
+          $("#type .list-item.selected").html("&#x25BE " + data_type);
+          $(".formula").text("result = data.to_json('" + data_type + "')");
+
+          var lintError;
+
+          var data_el = document.getElementById('data');
+          var data_editor = CodeMirror.fromTextArea(data_el, {
+            lineNumbers: true,
+            lineWrapping: true,
+            lint: true,
+            styleActiveLine: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            theme: "neo",
+            gutters: ["CodeMirror-lint-markers"],
+            tabSize: 2
+          });
+          data_editor.getDoc().setValue(data);
+          data_editor.on('change', function(editor){
+            run({data: editor.getValue()});
+          });
+          data_editor.on('focus', function(editor){
+            $(".list-item").removeClass("visible");
+          });
+
+          var result_el = document.getElementById('result');
+          var result_editor = CodeMirror.fromTextArea(result_el, {
+            lineNumbers: true,
+            lineWrapping: true,
+            theme: "neo",
+            tabSize: 2
+          });
+          result_editor.on('focus', function(editor){
+            $(".list-item").removeClass("visible");
+          });
+
+          if(mode) {
+            data_editor.setOption("keyMap", mode);
+            result_editor.setOption("keyMap", mode);	
+          }
+          var shocked = function(){
+            $(".title .logo").html("{ &#x02C3;&#x0335;&#x0311;&#x1D25;&#x02C2;&#x0335;&#x0311;}");
+            setTimeout(function(){
+              $(".title .logo").html("{ &#x00B7;&#x1D25;&#x00B7;}");
+            }, 1000);
+          }
+
+          var run = function(options){
+            if(options){
+              if(options.data){
+                try {
+                  data = options.data;
+                  localStorage.setItem('data', options.data);
+                } catch (e) {
+                }
+              } else {
+                localStorage.setItem('data', "");
+              }
+            }
+            try {
+              var res = data.to_json(data_type, function(result){
+                // asynchronous type
+                result_editor.getDoc().setValue(JSON.stringify(result, null, 2));
+              })
+              if(res){
+                // synchronous type
+                result_editor.getDoc().setValue(JSON.stringify(res, null, 2));
+              }
+            } catch (e) {
+              result_editor.getDoc().setValue("");
+            }
+          }
+
+          run();
+
+          $(document).on("click", ".list-item", function(e){
+            if($(this).hasClass("selected")){
+              $(this).parent().find(".list-item").toggleClass("visible");
+            } else {
+              var type = $(this).closest(".dropdown").attr("id");
+              shocked();
+              if(type == "editor"){
+                mode = $(this).text().trim().toLowerCase();
+                data_editor.setOption("keyMap", mode);
+                result_editor.setOption("keyMap", mode);
+                $(this).parent().find(".list-item").toggleClass("visible");
+                $(this).parent().find(".list-item.selected").html("&#x25BE " + mode);
+                localStorage.setItem('mode', mode);
+              } else if(type == "type"){
+                data_type = $(this).text().trim().toLowerCase();
+                $(".formula").text("result = data.to_json('" + data_type + "')");
+                localStorage.setItem('type', data_type);
+                $(this).parent().find(".list-item").toggleClass("visible");
+                $(this).parent().find(".list-item.selected").html("&#x25BE " + data_type);
+                run({data: data_editor.getValue()});
+              }
+            }
+          })
+        })
+      })(jQuery)
+    </script>
+  </head>
+  <body>
+    <div class='header'>
+      <div class='title'><span class='logo'>{ &#x00B7;&#x1D25;&#x00B7;}</span><span class='formula'></span></div> 
+      <a class='pull-right button' href='#'><i class='github'></i>Github</a>
+      <span class='pull-right button dropdown' href='#' id='editor'>
+				<a href='#' class='selected list-item'></a>
+				<a href='#' class='list-item'>vim</a>
+				<a href='#' class='list-item'>default</a>
+				<a href='#' class='list-item'>emacs</a>
+				<a href='#' class='list-item'>sublime</a>
+			</span>
+      <span class='pull-right button dropdown' href='#' id='type'>
+				<a href='#' class='selected list-item'></a>
+				<a href='#' class='list-item'>yaml</a>
+				<a href='#' class='list-item'>markdown</a>
+				<a href='#' class='list-item'>html</a>
+				<a href='#' class='list-item'>xml</a>
+				<a href='#' class='list-item'>svg</a>
+				<a href='#' class='list-item'>csv</a>
+				<a href='#' class='list-item'>hjson</a>
+				<a href='#' class='list-item'>cson</a>
+				<a href='#' class='list-item'>rss</a>
+			</span>
+    </div>
+    <div class='content'>
+      <div class='left col'>
+        <textarea id='data'></textarea>
+        <a href='#' class='label top'>Data</a>
+      </div>
+      <div class='right col'>
+        <textarea id='result'></textarea>
+        <a href='#' class='label top'>Result</a>
+      </div>
+    </div>
+  </body>
+</html>

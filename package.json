@@ -1,0 +1,14 @@
+{
+  "name": "to_json_demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "codemirror": "^5.25.0",
+    "jquery": "^3.2.1",
+    "jsonlint": "^1.6.2",
+    "to_json": "^1.0.2"
+  }
+}
