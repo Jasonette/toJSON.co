@@ -54,6 +54,7 @@
           data_editor.on('focus', function(editor){
             $(".list-item").removeClass("visible");
           });
+          data_editor.focus();
 
           var result_el = document.getElementById('result');
           var result_editor = CodeMirror.fromTextArea(result_el, {
