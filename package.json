@@ -5,10 +5,21 @@
   "main": "",
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "build": "browserify main.js --o dist/to_json.js"
+  },
   "dependencies": {
     "codemirror": "^5.25.0",
+    "cson.to_json": "^1.0.5",
+    "csv.to_json": "^1.0.5",
+    "feed.to_json": "^1.0.5",
+    "hjson.to_json": "^1.0.5",
+    "html.to_json": "^1.0.5",
     "jquery": "^3.2.1",
     "jsonlint": "^1.6.2",
-    "to_json": "^1.0.2"
+    "markdown.to_json": "^1.0.5",
+    "to_json": "^1.1.1",
+    "xml.to_json": "^1.0.5",
+    "yaml.to_json": "^1.0.5"
   }
 }

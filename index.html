@@ -16,7 +16,7 @@
     <script src='./node_modules/codemirror/keymap/vim.js'></script>
     <script src='./node_modules/codemirror/keymap/emacs.js'></script>
     <script src='./node_modules/codemirror/keymap/sublime.js'></script>
-    <script src='./node_modules/to_json/dist/to_json.js'></script>
+    <script src='./dist/to_json.js'></script>
     <script src='./node_modules/jquery/dist/jquery.min.js'></script>
     <script>
       (function($){
@@ -90,6 +90,7 @@
               }
             }
             try {
+              debugger;
               var res = data.to_json(data_type, function(result){
                 // asynchronous type
                 result_editor.getDoc().setValue(JSON.stringify(result, null, 2));
